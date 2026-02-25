@@ -1,10 +1,5 @@
 use std::{env, fs};
-use zed_extension_api::{
-    self as zed,
-    serde_json,
-    settings::LspSettings,
-    Result,
-};
+use zed_extension_api::{self as zed, serde_json, settings::LspSettings, Result};
 
 const PACKAGE_NAME: &str = "@likec4/language-server";
 const LANGUAGE_SERVER_ID: &str = "likec4-language-server";
@@ -51,9 +46,17 @@ fn percent_encode(s: &str) -> String {
     let mut out = String::with_capacity(s.len() * 2);
     for byte in s.bytes() {
         match byte {
-            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9'
-            | b'-' | b'_' | b'.' | b'~'
-            | b'!' | b'*' | b'(' | b')' => {
+            b'A'..=b'Z'
+            | b'a'..=b'z'
+            | b'0'..=b'9'
+            | b'-'
+            | b'_'
+            | b'.'
+            | b'~'
+            | b'!'
+            | b'*'
+            | b'('
+            | b')' => {
                 out.push(byte as char);
             }
             _ => {
@@ -77,15 +80,10 @@ impl LikeC4Extension {
         fs::metadata(path).is_ok_and(|stat| stat.is_file())
     }
 
-    fn server_script_path(
-        &mut self,
-        language_server_id: &zed::LanguageServerId,
-    ) -> Result<String> {
+    fn server_script_path(&mut self, language_server_id: &zed::LanguageServerId) -> Result<String> {
         let (os, _arch) = zed::current_platform();
         let server_path = match os {
-            zed::Os::Mac | zed::Os::Linux => {
-                "node_modules/.bin/likec4-language-server".to_string()
-            }
+            zed::Os::Mac | zed::Os::Linux => "node_modules/.bin/likec4-language-server".to_string(),
             zed::Os::Windows => {
                 "node_modules/@likec4/language-server/bin/likec4-language-server.mjs".to_string()
             }
@@ -117,7 +115,6 @@ impl LikeC4Extension {
         };
 
         if let (true, Some(ref latest)) = (needs_install, &latest_version) {
-
             zed::set_language_server_installation_status(
                 language_server_id,
                 &zed::LanguageServerInstallationStatus::Downloading,
@@ -190,8 +187,7 @@ impl zed::Extension for LikeC4Extension {
         _language_server_id: &zed::LanguageServerId,
         worktree: &zed::Worktree,
     ) -> Result<Option<serde_json::Value>> {
-        LspSettings::for_worktree(LANGUAGE_SERVER_ID, worktree)
-            .map(|s| s.settings.clone())
+        LspSettings::for_worktree(LANGUAGE_SERVER_ID, worktree).map(|s| s.settings.clone())
     }
 }
 
