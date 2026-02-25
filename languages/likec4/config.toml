@@ -1,0 +1,6 @@
+name = "LikeC4"
+grammar = "likec4"
+path_suffixes = ["likec4", "c4"]
+line_comments = ["//"]
+block_comments = [["/*", "*/"]]
+tab_size = 2

@@ -1,0 +1,15 @@
+id = "likec4"
+name = "LikeC4"
+description = "LikeC4 architecture-as-code language support."
+version = "0.0.1"
+schema_version = 1
+authors = ["Ivan Kuzmin"]
+repository = "https://github.com/Lenivvenil/zed-likec4"
+
+[grammars.likec4]
+repository = "https://github.com/Lenivvenil/tree-sitter-likec4"
+rev = "f49d5677c2da1baf918ed72791dcbbd606f8eb18"
+
+[language_servers.likec4-language-server]
+name = "LikeC4 Language Server"
+language = "LikeC4"

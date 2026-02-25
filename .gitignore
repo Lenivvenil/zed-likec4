@@ -1,0 +1,6 @@
+/target
+/grammars
+*.wasm
+Cargo.lock
+.DS_Store
+.claude/
