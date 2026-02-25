@@ -100,19 +100,29 @@ impl LikeC4Extension {
             &zed::LanguageServerInstallationStatus::CheckingForUpdate,
         );
 
-        let latest_version = zed::npm_package_latest_version(PACKAGE_NAME)?;
+        let latest_version = match zed::npm_package_latest_version(PACKAGE_NAME) {
+            Ok(version) => Some(version),
+            Err(_) if self.server_exists(&server_path) => None,
+            Err(err) => return Err(err),
+        };
 
-        let needs_install = !self.server_exists(&server_path)
-            || zed::npm_package_installed_version(PACKAGE_NAME)?
-                .is_none_or(|installed| installed != latest_version);
+        let needs_install = if let Some(ref latest) = latest_version {
+            !self.server_exists(&server_path)
+                || zed::npm_package_installed_version(PACKAGE_NAME)?
+                    .is_none_or(|installed| installed != *latest)
+        } else {
+            false
+        };
 
         if needs_install {
+            let latest = latest_version.as_ref().unwrap();
+
             zed::set_language_server_installation_status(
                 language_server_id,
                 &zed::LanguageServerInstallationStatus::Downloading,
             );
 
-            let result = zed::npm_install_package(PACKAGE_NAME, &latest_version);
+            let result = zed::npm_install_package(PACKAGE_NAME, latest);
             match result {
                 Ok(()) => {
                     if !self.server_exists(&server_path) {
@@ -148,7 +158,7 @@ impl zed::Extension for LikeC4Extension {
     ) -> Result<zed::Command> {
         let server_path = self.server_script_path(language_server_id)?;
         let server_abs = env::current_dir()
-            .unwrap()
+            .map_err(|e| format!("failed to get current directory: {e}"))?
             .join(&server_path)
             .to_string_lossy()
             .to_string();
