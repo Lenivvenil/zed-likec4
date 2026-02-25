@@ -108,14 +108,15 @@ impl LikeC4Extension {
 
         let needs_install = if let Some(ref latest) = latest_version {
             !self.server_exists(&server_path)
-                || zed::npm_package_installed_version(PACKAGE_NAME)?
+                || zed::npm_package_installed_version(PACKAGE_NAME)
+                    .ok()
+                    .flatten()
                     .is_none_or(|installed| installed != *latest)
         } else {
             false
         };
 
-        if needs_install {
-            let latest = latest_version.as_ref().unwrap();
+        if let (true, Some(ref latest)) = (needs_install, &latest_version) {
 
             zed::set_language_server_installation_status(
                 language_server_id,
