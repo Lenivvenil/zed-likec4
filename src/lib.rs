@@ -6,6 +6,9 @@ const LANGUAGE_SERVER_ID: &str = "likec4-language-server";
 
 /// Custom ESM resolve hook passed to Node.js via `--import data:text/javascript,...`.
 ///
+/// TODO: Remove once upstream restores a standalone bundled entry point.
+/// Tracking: https://github.com/likec4/likec4/issues/2840
+///
 /// Fixes two issues with the `@likec4/language-server` package under Node.js v22+:
 ///
 /// 1. **Missing `.js` extensions** — `vscode-languageserver` has no `exports` field in its
