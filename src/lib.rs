@@ -1,78 +1,8 @@
 use std::{env, fs};
 use zed_extension_api::{self as zed, serde_json, settings::LspSettings, Result};
 
-const PACKAGE_NAME: &str = "@likec4/language-server";
+const PACKAGE_NAME: &str = "@likec4/lsp";
 const LANGUAGE_SERVER_ID: &str = "likec4-language-server";
-
-/// Custom ESM resolve hook passed to Node.js via `--import data:text/javascript,...`.
-///
-/// TODO: Remove once upstream restores a standalone bundled entry point.
-/// Tracking: https://github.com/likec4/likec4/issues/2840
-///
-/// Fixes two issues with the `@likec4/language-server` package under Node.js v22+:
-///
-/// 1. **Missing `.js` extensions** — `vscode-languageserver` has no `exports` field in its
-///    package.json, so ESM subpath imports like `vscode-languageserver/node` fail under strict
-///    ESM resolution. The hook retries with a `.js` suffix.
-///
-/// 2. **Missing optional peer dependencies** — `bundle-require` and `esbuild` are optional
-///    peer deps used only for loading `likec4.config.ts` files. They are not needed for LSP
-///    operations, so the hook provides lightweight stubs instead of requiring heavy native
-///    binaries.
-fn esm_resolve_hook() -> String {
-    let mocks = r#"{"bundle-require":"export function bundleRequire(){throw new Error('not available')}","esbuild":"export function formatMessagesSync(){return[]}"}"#;
-
-    let loader = format!(
-        concat!(
-            "const M={mocks};",
-            "export async function resolve(s,c,n){{",
-            "if(M[s])return{{url:'data:text/javascript,'+encodeURIComponent(M[s]),shortCircuit:true}};",
-            "try{{return await n(s,c)}}",
-            "catch(e){{",
-            "if(e.code==='ERR_MODULE_NOT_FOUND'&&s.includes('/')&&!s.endsWith('.js')&&!s.startsWith('node:')&&!s.startsWith('.')){{",
-            "try{{return await n(s+'.js',c)}}catch{{}}}};",
-            "throw e}}}}",
-        ),
-        mocks = mocks,
-    );
-
-    let hook = format!(
-        "import{{register}}from'node:module';register('data:text/javascript,{loader}',import.meta.url);",
-        loader = percent_encode(&loader),
-    );
-
-    format!("data:text/javascript,{}", percent_encode(&hook))
-}
-
-/// Percent-encode a string for use in a data: URI.
-fn percent_encode(s: &str) -> String {
-    let mut out = String::with_capacity(s.len() * 2);
-    for byte in s.bytes() {
-        match byte {
-            b'A'..=b'Z'
-            | b'a'..=b'z'
-            | b'0'..=b'9'
-            | b'-'
-            | b'_'
-            | b'.'
-            | b'~'
-            | b'!'
-            | b'*'
-            | b'('
-            | b')' => {
-                out.push(byte as char);
-            }
-            _ => {
-                out.push('%');
-                out.push(char::from(HEX[(byte >> 4) as usize]));
-                out.push(char::from(HEX[(byte & 0xF) as usize]));
-            }
-        }
-    }
-    out
-}
-
-const HEX: [u8; 16] = *b"0123456789ABCDEF";
 
 struct LikeC4Extension {
     did_find_server: bool,
@@ -86,10 +16,8 @@ impl LikeC4Extension {
     fn server_script_path(&mut self, language_server_id: &zed::LanguageServerId) -> Result<String> {
         let (os, _arch) = zed::current_platform();
         let server_path = match os {
-            zed::Os::Mac | zed::Os::Linux => "node_modules/.bin/likec4-language-server".to_string(),
-            zed::Os::Windows => {
-                "node_modules/@likec4/language-server/bin/likec4-language-server.mjs".to_string()
-            }
+            zed::Os::Mac | zed::Os::Linux => "node_modules/.bin/likec4-lsp".to_string(),
+            zed::Os::Windows => "node_modules/@likec4/lsp/bin/likec4-lsp.mjs".to_string(),
         };
 
         if self.did_find_server && self.server_exists(&server_path) {
@@ -166,12 +94,7 @@ impl zed::Extension for LikeC4Extension {
 
         Ok(zed::Command {
             command: zed::node_binary_path()?,
-            args: vec![
-                "--import".to_string(),
-                esm_resolve_hook(),
-                server_abs,
-                "--stdio".to_string(),
-            ],
+            args: vec![server_abs, "--stdio".to_string()],
             env: Default::default(),
         })
     }
