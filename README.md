@@ -1,10 +1,13 @@
 # LikeC4 for Zed
 
+[![CI](https://github.com/Lenivvenil/zed-likec4/actions/workflows/ci.yml/badge.svg)](https://github.com/Lenivvenil/zed-likec4/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 [LikeC4](https://likec4.dev) language support for the [Zed](https://zed.dev) editor.
 
 LikeC4 is an architecture-as-code DSL that lets you describe your software architecture with a simple, human-readable language and visualize it as interactive diagrams.
 
-This extension brings first-class LikeC4 editing experience to Zed with a custom [tree-sitter grammar](https://github.com/Lenivvenil/tree-sitter-likec4) and the official [LikeC4 Language Server](https://www.npmjs.com/package/@likec4/language-server).
+This extension brings first-class LikeC4 editing experience to Zed with a custom [tree-sitter grammar](https://github.com/Lenivvenil/tree-sitter-likec4) and the official [LikeC4 Language Server](https://www.npmjs.com/package/@likec4/lsp).
 
 ## Features
 
@@ -62,7 +65,11 @@ You can pass custom settings to the LikeC4 language server through your Zed sett
 ### Building
 
 ```bash
-cargo check --target wasm32-wasip1
+# Lint (mirrors CI)
+cargo clippy --target wasm32-wasip1 -- -D warnings
+
+# Build release WASM
+cargo build --release --target wasm32-wasip1
 ```
 
 ### Testing locally
@@ -82,7 +89,7 @@ cargo check --target wasm32-wasip1
 
 - [LikeC4 Website](https://likec4.dev)
 - [LikeC4 DSL Specification](https://likec4.dev/dsl/specification/)
-- [LikeC4 Language Server (npm)](https://www.npmjs.com/package/@likec4/language-server)
+- [LikeC4 Language Server (npm)](https://www.npmjs.com/package/@likec4/lsp)
 - [LikeC4 GitHub Repository](https://github.com/likec4/likec4)
 - [Tree-sitter Grammar](https://github.com/Lenivvenil/tree-sitter-likec4)
 

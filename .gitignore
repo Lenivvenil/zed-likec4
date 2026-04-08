@@ -1,6 +1,15 @@
+# Build artifacts
 /target
-/grammars
 *.wasm
+
+# Downloaded tree-sitter grammar (fetched by Zed at build time)
+/grammars
+
+# Regenerated from Cargo.toml by cargo
 Cargo.lock
+
+# OS files
 .DS_Store
+
+# Claude Code
 .claude/
