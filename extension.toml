@@ -5,6 +5,7 @@ version = "0.0.1"
 schema_version = 1
 authors = ["Ivan Kuzmin"]
 repository = "https://github.com/Lenivvenil/zed-likec4"
+categories = ["Languages"]
 
 [grammars.likec4]
 repository = "https://github.com/Lenivvenil/tree-sitter-likec4"

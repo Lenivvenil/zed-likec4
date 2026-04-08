@@ -1,5 +1,11 @@
 use std::{env, fs};
-use zed_extension_api::{self as zed, serde_json, settings::LspSettings, Result};
+use zed_extension_api::{
+    self as zed,
+    lsp::{Completion, CompletionKind, Symbol, SymbolKind},
+    serde_json,
+    settings::LspSettings,
+    CodeLabel, CodeLabelSpan, Result,
+};
 
 const PACKAGE_NAME: &str = "@likec4/lsp";
 const LANGUAGE_SERVER_ID: &str = "likec4-language-server";
@@ -114,6 +120,53 @@ impl zed::Extension for LikeC4Extension {
         worktree: &zed::Worktree,
     ) -> Result<Option<serde_json::Value>> {
         LspSettings::for_worktree(LANGUAGE_SERVER_ID, worktree).map(|s| s.settings.clone())
+    }
+
+    fn label_for_completion(
+        &self,
+        _language_server_id: &zed::LanguageServerId,
+        completion: Completion,
+    ) -> Option<CodeLabel> {
+        let label = completion.label.clone();
+        let highlight = match completion.kind? {
+            CompletionKind::Keyword => "keyword",
+            CompletionKind::Class => "type.class",
+            CompletionKind::Property => "property",
+            CompletionKind::EnumMember | CompletionKind::Value | CompletionKind::Constant => {
+                "constant"
+            }
+            _ => return None,
+        };
+        Some(CodeLabel {
+            code: label.clone(),
+            spans: vec![CodeLabelSpan::literal(label, Some(highlight.to_string()))],
+            filter_range: (0..completion.label.len()).into(),
+        })
+    }
+
+    fn label_for_symbol(
+        &self,
+        _language_server_id: &zed::LanguageServerId,
+        symbol: Symbol,
+    ) -> Option<CodeLabel> {
+        let name = symbol.name.clone();
+        let highlight = match symbol.kind {
+            SymbolKind::Class | SymbolKind::Struct => "type.class",
+            SymbolKind::Module | SymbolKind::Namespace => "keyword",
+            SymbolKind::Property | SymbolKind::Field => "property",
+            _ => {
+                return Some(CodeLabel {
+                    code: name.clone(),
+                    spans: vec![CodeLabelSpan::literal(name, None)],
+                    filter_range: (0..symbol.name.len()).into(),
+                })
+            }
+        };
+        Some(CodeLabel {
+            code: name.clone(),
+            spans: vec![CodeLabelSpan::literal(name, Some(highlight.to_string()))],
+            filter_range: (0..symbol.name.len()).into(),
+        })
     }
 }
 
