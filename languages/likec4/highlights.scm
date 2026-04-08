@@ -61,6 +61,15 @@
 (where_not "not" @keyword)
 (where_and "and" @keyword)
 (where_or "or" @keyword)
+(where_condition
+  [
+    "tag"
+    "kind"
+    "source.tag"
+    "source.kind"
+    "target.tag"
+    "target.kind"
+  ] @keyword)
 
 ; ── Element filter keywords ──────────────────────────────────────
 (element_filter "element.kind" @keyword)
@@ -94,7 +103,11 @@
 (icon_property "icon" @property)
 (navigate_to "navigateTo" @property)
 (metadata_block "metadata" @keyword)
+(metadata_entry key: (identifier) @property)
 (style_block "style" @keyword)
+
+; ── Likec4lib keywords ────────────────────────────────────────────
+(_likec4lib_item "icons" @keyword)
 
 ; ── Layout directions ────────────────────────────────────────────
 [

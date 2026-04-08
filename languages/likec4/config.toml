@@ -4,3 +4,4 @@ path_suffixes = ["likec4", "c4"]
 line_comments = ["//"]
 block_comments = [["/*", "*/"]]
 tab_size = 2
+word_characters = ["-"]

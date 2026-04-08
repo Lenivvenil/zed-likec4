@@ -35,3 +35,25 @@
 (deployment_node
   kind: (identifier) @context
   name: (identifier) @name) @item
+
+(likec4lib_block "likec4lib" @context @name) @item
+
+(color_declaration
+  "color" @context
+  name: (identifier) @name) @item
+
+(deployment_node_kind_declaration
+  "deploymentNode" @context
+  name: (identifier) @name) @item
+
+(global_style
+  "style" @context
+  name: (identifier) @name) @item
+
+(global_style_group
+  "styleGroup" @context
+  name: (identifier) @name) @item
+
+(extend_element
+  "extend" @context
+  (fqn_ref) @name) @item

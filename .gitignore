@@ -8,6 +8,10 @@
 # Regenerated from Cargo.toml by cargo
 Cargo.lock
 
+# IDE directories
+.vscode/
+.idea/
+
 # OS files
 .DS_Store
 
