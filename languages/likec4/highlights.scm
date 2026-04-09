@@ -107,7 +107,7 @@
 (style_block "style" @keyword)
 
 ; ── Likec4lib keywords ────────────────────────────────────────────
-(_likec4lib_item "icons" @keyword)
+(likec4lib_block "icons" @keyword)
 
 ; ── Layout directions ────────────────────────────────────────────
 [
